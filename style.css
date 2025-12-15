@@ -1,0 +1,20 @@
+html, body {
+  margin: 0;
+  padding: 0;
+  overflow: hidden;
+  background: linear-gradient(#ffb347, #ffcc33);
+  font-family: Arial, sans-serif;
+}
+
+canvas {
+  display: block;
+}
+
+#ui {
+  position: fixed;
+  top: 10px;
+  left: 10px;
+  color: #222;
+  font-size: 18px;
+  font-weight: bold;
+}
