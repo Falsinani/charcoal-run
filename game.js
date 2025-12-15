@@ -68,6 +68,19 @@ function spawnObstacle() {
 
 setInterval(spawnObstacle, 1800);
 
+// 🔥 Fire Sparks (Collectibles)
+let sparks = [];
+
+function spawnSpark() {
+  sparks.push({
+    x: canvas.width,
+    y: canvas.height - groundHeight - 80 - Math.random() * 120,
+    r: 10
+  });
+}
+
+setInterval(spawnSpark, 1500);
+
 // 🏃 Game Loop
 function loop() {
   ctx.clearRect(0, 0, canvas.width, canvas.height);
@@ -105,6 +118,38 @@ function loop() {
 
   speed += 0.001;
 
+// 🔥 Draw Sparks
+sparks.forEach((s, i) => {
+  s.x -= speed;
+
+  // Glow effect
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, s.r + 5, 0, Math.PI * 2);
+  ctx.fillStyle = "rgba(255, 140, 0, 0.3)";
+  ctx.fill();
+
+  ctx.beginPath();
+  ctx.arc(s.x, s.y, s.r, 0, Math.PI * 2);
+  ctx.fillStyle = "#FF5722";
+  ctx.fill();
+
+  // Collision with player
+  if (
+    player.x < s.x + s.r &&
+    player.x + player.w > s.x - s.r &&
+    player.y < s.y + s.r &&
+    player.y + player.h > s.y - s.r
+  ) {
+    sparks.splice(i, 1);
+    score += 50;
+  }
+
+  if (s.x < -20) {
+    sparks.splice(i, 1);
+  }
+});
+
+  
   requestAnimationFrame(loop);
 }
 
