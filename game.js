@@ -6,12 +6,15 @@ canvas.height = window.innerHeight;
 
 // ------------------ GAME VARS ------------------
 let gravity = 0.7;
-let score = 50; // نبدأ بنقاط
+let score = 50;
 let speed = 6;
 let energy = 100;
 let gameRunning = true;
 
 const groundHeight = 80;
+
+// ⏱️ Speed increase control
+let lastSpeedIncrease = Date.now();
 
 // ------------------ UI ------------------
 const scoreUI = document.getElementById("score");
@@ -107,15 +110,15 @@ const player = {
   }
 };
 
-// ------------------ OBSTACLES (WATER) ------------------
+// ------------------ WATER DROPS ------------------
 let obstacles = [];
 
 function spawnObstacle() {
   obstacles.push({
     x: canvas.width,
     y: canvas.height - groundHeight - 40,
-    w: 40,
-    h: 40
+    w: 20,   // نصف الحجم
+    h: 40    // شكل بيضاوي طولي
   });
 }
 setInterval(spawnObstacle, 1800);
@@ -159,11 +162,22 @@ function loop() {
   player.update();
   player.draw();
 
-  // Water Obstacles
+  // Water Drops (oval)
   obstacles.forEach((o, i) => {
     o.x -= speed;
+
     ctx.fillStyle = "#4FC3F7";
-    ctx.fillRect(o.x, o.y, o.w, o.h);
+    ctx.beginPath();
+    ctx.ellipse(
+      o.x + o.w / 2,
+      o.y + o.h / 2,
+      o.w / 2,
+      o.h / 2,
+      0,
+      0,
+      Math.PI * 2
+    );
+    ctx.fill();
 
     if (
       player.x < o.x + o.w &&
@@ -218,15 +232,17 @@ function loop() {
     if (s.x < -30) sparks.splice(i, 1);
   });
 
-  // Energy drain (مساعد فقط)
-  energy -= 0.03;
-  energy = Math.max(energy, 0);
+  // Energy drain
+  energy = Math.max(energy - 0.03, 0);
+
+  // ⏱️ Increase speed every 20 seconds by 5%
+  if (Date.now() - lastSpeedIncrease >= 20000) {
+    speed *= 1.05;
+    lastSpeedIncrease = Date.now();
+  }
 
   drawEnergy();
-
   scoreUI.innerText = "Score: " + score;
-
-  speed += 0.001;
 
   requestAnimationFrame(loop);
 }
